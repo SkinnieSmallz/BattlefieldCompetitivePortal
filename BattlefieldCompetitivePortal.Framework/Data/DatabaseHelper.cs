@@ -35,7 +35,6 @@ namespace BattlefieldCompetitivePortal.Framework.Data
                     {
                         adapter.Fill(dt);
                     }
-
                 }
             }
             return dt;
@@ -51,7 +50,6 @@ namespace BattlefieldCompetitivePortal.Framework.Data
                     {
                         cmd.Parameters.AddRange(parameters);
                         conn.Open();
-
                     }
 
                     return cmd.ExecuteNonQuery();
@@ -69,7 +67,6 @@ namespace BattlefieldCompetitivePortal.Framework.Data
                     {
                         cmd.Parameters.AddRange(parameters);
                         conn.Open();
-
                     }
 
                     object result = cmd.ExecuteScalar();
