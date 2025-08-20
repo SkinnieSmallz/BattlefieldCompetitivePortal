@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36127.28 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattlefieldCompetitivePortal.MVC", "BattlefieldCompetitivePortal.MVC\BattlefieldCompetitivePortal.MVC.csproj", "{2F397D1D-593C-4A31-B1AE-5D5DC5BAE404}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattlefieldCompetitivePortal.Framework", "BattlefieldCompetitivePortal.Framework\BattlefieldCompetitivePortal.Framework.csproj", "{5D4CCEE7-7849-4333-BFFF-175B91B1B298}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "BattlefieldCompetitivePortal.Database", "BattlefieldCompetitivePortal.Database\BattlefieldCompetitivePortal.Database.sqlproj", "{2E9A583C-DBC7-4F8D-B673-F69C7D34623F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattlefieldCompetitivePortal.API.Client", "BattlefieldCompetitivePortal.API.Client\BattlefieldCompetitivePortal.API.Client.csproj", "{04EF3F25-AADE-4031-BFE2-A94894EEA670}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattlefieldCompetitivePortal.API", "BattlefieldCompetitivePortal.API\BattlefieldCompetitivePortal.API.csproj", "{B85F375A-D17C-4234-AC8B-688297042337}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F397D1D-593C-4A31-B1AE-5D5DC5BAE404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F397D1D-593C-4A31-B1AE-5D5DC5BAE404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F397D1D-593C-4A31-B1AE-5D5DC5BAE404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F397D1D-593C-4A31-B1AE-5D5DC5BAE404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D4CCEE7-7849-4333-BFFF-175B91B1B298}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D4CCEE7-7849-4333-BFFF-175B91B1B298}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D4CCEE7-7849-4333-BFFF-175B91B1B298}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D4CCEE7-7849-4333-BFFF-175B91B1B298}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E9A583C-DBC7-4F8D-B673-F69C7D34623F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E9A583C-DBC7-4F8D-B673-F69C7D34623F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E9A583C-DBC7-4F8D-B673-F69C7D34623F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{2E9A583C-DBC7-4F8D-B673-F69C7D34623F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E9A583C-DBC7-4F8D-B673-F69C7D34623F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E9A583C-DBC7-4F8D-B673-F69C7D34623F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{04EF3F25-AADE-4031-BFE2-A94894EEA670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04EF3F25-AADE-4031-BFE2-A94894EEA670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04EF3F25-AADE-4031-BFE2-A94894EEA670}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04EF3F25-AADE-4031-BFE2-A94894EEA670}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B85F375A-D17C-4234-AC8B-688297042337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B85F375A-D17C-4234-AC8B-688297042337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B85F375A-D17C-4234-AC8B-688297042337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B85F375A-D17C-4234-AC8B-688297042337}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B45071DB-7F01-46F1-86FB-36C18D9CD059}
+	EndGlobalSection
+EndGlobal
