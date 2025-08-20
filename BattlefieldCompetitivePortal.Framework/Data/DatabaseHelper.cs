@@ -16,7 +16,7 @@ namespace BattlefieldCompetitivePortal.Framework.Data
         private static string ConnectionString =>
             ConfigurationManager.ConnectionStrings["BattlefieldPortal"].ConnectionString;
 
-        public static DataTable ExecuteQuery(string query, params SqlParameter[] parameters)
+        public static async Task<DataTable> ExecuteQueryAsync(string query, params SqlParameter[] parameters)
         {
             DataTable dt = new DataTable();
 
@@ -28,54 +28,72 @@ namespace BattlefieldCompetitivePortal.Framework.Data
                     {
                         cmd.Parameters.AddRange(parameters);
                     }
-
-                    conn.Open();
-
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    else
                     {
-                        adapter.Fill(dt);
+                        //error logging
+                    }
+
+                    await conn.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        dt.Load(reader);
                     }
                 }
             }
             return dt;
         }
 
-        public static int ExecuteNonQuery(string query, params SqlParameter[] parameters)
+        public static async Task<int> ExecuteNonQueryAsync(string query, params SqlParameter[] parameters)
         {
             using (SqlConnection conn = new SqlConnection(ConnectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                if (parameters != null)
                 {
-                    if (parameters != null)
-                    {
-                        cmd.Parameters.AddRange(parameters);
-                        conn.Open();
-                    }
-
-                    return cmd.ExecuteNonQuery();
+                    cmd.Parameters.AddRange(parameters);
                 }
+                else
+                {
+                    //error logging
+                }
+
+                await conn.OpenAsync();
+                return await cmd.ExecuteNonQueryAsync();
+
             }
         }
 
-        public static T ExecuteScalar<T>(string query, params SqlParameter[] parameters)
+        public static async Task<T> ExecuteScalarAsync<T>(string query, params SqlParameter[] parameters)
         {
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    if (parameters != null)
-                    {
-                        cmd.Parameters.AddRange(parameters);
-                        conn.Open();
-                    }
+            if (string.IsNullOrEmpty(query))
+                throw new ArgumentException("Query cannot be null or empty", nameof(query));
 
-                    object result = cmd.ExecuteScalar();
-                    return result == DBNull.Value ? default(T) : (T)result;
-                }
+            try
+            {
+                using var conn = new SqlConnection(ConnectionString);
+                using var cmd = new SqlCommand(query, conn);
+
+                if (parameters?.Length > 0)
+                    cmd.Parameters.AddRange(parameters);
+
+                await conn.OpenAsync();
+                var result = await cmd.ExecuteScalarAsync();
+
+                if (result == null || result == DBNull.Value)
+                    return default(T);
+
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                throw; // or handle appropriately
             }
         }
     }
 }
+    
 
 
 
