@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{2e9a583c-dbc7-4f8d-b673-f69c7d34623f}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -16,12 +16,13 @@
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetLanguage>CS</TargetLanguage>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -56,14 +57,44 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="Tables" />
+    <Folder Include="Stored Procedures" />
+    <Folder Include="Functions" />
+    <Folder Include="Tables\auth" />
+    <Folder Include="Tables\teams" />
+    <Folder Include="Tables\tournaments" />
+    <Folder Include="Tables\scrims" />
+    <Folder Include="Tables\notifications" />
+    <Folder Include="Stored Procedures\teams" />
+    <Folder Include="Stored Procedures\tournaments" />
+    <Folder Include="Stored Procedures\scrims" />
+    <Folder Include="Stored Procedures\notifications" />
+    <Folder Include="Stored Procedures\auth" />
+    <Folder Include="Functions\tournaments" />
+    <Folder Include="Functions\teams" />
+    <Folder Include="Functions\scrims" />
+    <Folder Include="Functions\notifications" />
+    <Folder Include="Functions\auth" />
+    <Folder Include="Tables\admin" />
+    <Folder Include="Stored Procedures\admin" />
+    <Folder Include="Functions\admin" />
+    <Folder Include="Schemas" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BattlefieldCompetitivePortal.Framework\BattlefieldCompetitivePortal.Framework.csproj">
-      <Name>BattlefieldCompetitivePortal.Framework</Name>
-      <Project>{5d4ccee7-7849-4333-bfff-175b91b1b298}</Project>
-      <Private>True</Private>
-      <IsModelAware>True</IsModelAware>
-      <GenerateSqlClrDdl>True</GenerateSqlClrDdl>
-    </ProjectReference>
+    <Build Include="Schemas\tournaments.sql" />
+    <Build Include="Schemas\teams.sql" />
+    <Build Include="Schemas\scrims.sql" />
+    <Build Include="Schemas\notifications.sql" />
+    <Build Include="Schemas\matches.sql" />
+    <Build Include="Schemas\auth.sql" />
+    <Build Include="Schemas\admin.sql" />
+    <Build Include="Tables\auth\Users.sql" />
+    <Build Include="Tables\teams\Teams.sql" />
+    <Build Include="Tables\tournaments\Tournaments.sql" />
+    <Build Include="Tables\scrims\Scrims.sql" />
+    <Build Include="Tables\tournaments\TournamentRegistrations.sql" />
+    <Build Include="Tables\teams\TeamJoinRequests.sql" />
+    <Build Include="Tables\notifications\Notifications.sql" />
+    <Build Include="Tables\notifications\Notices.sql" />
   </ItemGroup>
 </Project>

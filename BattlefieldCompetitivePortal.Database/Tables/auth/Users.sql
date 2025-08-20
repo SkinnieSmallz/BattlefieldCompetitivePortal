@@ -1,0 +1,12 @@
+﻿CREATE TABLE [auth].[Users]
+(
+	UserId INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(50) UNIQUE NOT NULL,
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Role INT NOT NULL,
+    TeamId INT NULL,
+    PlayerRole INT NULL,
+    CreatedDate DATETIME2 DEFAULT GETDATE(),
+    IsActive BIT DEFAULT 1
+)
