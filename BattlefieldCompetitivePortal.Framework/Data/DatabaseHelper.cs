@@ -46,27 +46,22 @@ namespace BattlefieldCompetitivePortal.Framework.Data
 
         public static async Task<int> ExecuteNonQueryAsync(string query, params SqlParameter[] parameters)
         {
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
-            {
-                if (parameters != null)
-                {
-                    cmd.Parameters.AddRange(parameters);
-                }
-                else
-                {
-                    //error logging // throw here 
-                }
+            if (string.IsNullOrWhiteSpace(query))
+                throw new ArgumentException("Query cannot be null, empty, or whitespace.", nameof(query));
 
-                await conn.OpenAsync();
-                return await cmd.ExecuteNonQueryAsync();
+            using var conn = new SqlConnection(ConnectionString);
+            using var cmd = new SqlCommand(query, conn);
 
-            }
+            if (parameters != null)
+                cmd.Parameters.AddRange(parameters);
+
+            await conn.OpenAsync();
+            return await cmd.ExecuteNonQueryAsync();
         }
 
         public static async Task<T> ExecuteScalarAsync<T>(string query, params SqlParameter[] parameters) //  Add try with block at last application layer 
         {
-            if (string.IsNullOrEmpty(query))
+            if (string.IsNullOrWhiteSpace(query))
                 throw new ArgumentException("Query cannot be null or empty", nameof(query));
 
             try
@@ -81,7 +76,7 @@ namespace BattlefieldCompetitivePortal.Framework.Data
                 var result = await cmd.ExecuteScalarAsync();
 
                 if (result == null || result == DBNull.Value)
-                    return default(T);
+                    return default;
 
                 return (T)Convert.ChangeType(result, typeof(T));
             }
@@ -93,7 +88,7 @@ namespace BattlefieldCompetitivePortal.Framework.Data
         }
     }
 }
-    
+
 
 
 
