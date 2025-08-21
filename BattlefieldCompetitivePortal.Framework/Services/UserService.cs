@@ -57,7 +57,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             return dt.Rows.Count > 0 ? MapUserFromDataRow(dt.Rows[0]) : null;
         }
 
-        public async bool CreateUser(User user)
+        public async Task<bool> CreateUser(User user)
         {
             user.PasswordHash = AuthenticationHelper.HashPassword(user.PasswordHash);
 
