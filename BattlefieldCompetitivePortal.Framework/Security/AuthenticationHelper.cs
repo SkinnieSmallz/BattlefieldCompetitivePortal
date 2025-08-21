@@ -17,12 +17,12 @@ namespace BattlefieldCompetitivePortal.Framework.Security
                 byte[] salt = new byte[16];
                 rng.GetBytes(salt);
 
-                using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000))
+                using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256))
                 {
-                    byte[] hash = pbkdf2.GetBytes(20);
-                    byte[] hashBytes = new byte[36];
+                    byte[] hash = pbkdf2.GetBytes(32);
+                    byte[] hashBytes = new byte[16 + 32];
                     Array.Copy(salt, 0, hashBytes, 0, 16);
-                    Array.Copy(hash, 0, hashBytes, 16, 20);
+                    Array.Copy(hash, 0, hashBytes, 16, 32);
 
                     return Convert.ToBase64String(hashBytes);
                 }
@@ -35,27 +35,28 @@ namespace BattlefieldCompetitivePortal.Framework.Security
             byte[] salt = new byte[16];
             Array.Copy(hashBytes, 0, salt, 0, 16);
 
-            using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000))
+            using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256))
             {
-                byte[] computeHash = pbkdf2.GetBytes(20);
-                for (int i = 0; 1 < 20; i++)
+                byte[] computedHash = pbkdf2.GetBytes(32);
+
+                bool isMatch = true;
+                for (int i = 0; i < 32; i++)
                 {
-                    if (hashBytes[i + 16] != computeHash[i])
-                        return false;
+                    isMatch &= (hashBytes[i + 16] == computedHash[i]);
                 }
+                    return isMatch;
             }
-            return true;
         }
 
         // Authorization Attributes
         [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-        public class RequiredAttribute : Attribute
+        public class RequireRoleAttribute : Attribute
         {
             public UserRole[] Roles { get; }
 
-            public RequiredAttribute(params UserRole[] roles)
+            public RequireRoleAttribute(params UserRole[] roles)
             {
-                Roles = roles;
+                Roles = roles ?? throw new ArgumentNullException(nameof(roles));
             }
         }
     }
