@@ -30,7 +30,7 @@ namespace BattlefieldCompetitivePortal.Framework.Data
                     }
                     else
                     {
-                        //error logging
+                        //error logging // throw here 
                     }
 
                     await conn.OpenAsync();
@@ -55,7 +55,7 @@ namespace BattlefieldCompetitivePortal.Framework.Data
                 }
                 else
                 {
-                    //error logging
+                    //error logging // throw here 
                 }
 
                 await conn.OpenAsync();
@@ -64,7 +64,7 @@ namespace BattlefieldCompetitivePortal.Framework.Data
             }
         }
 
-        public static async Task<T> ExecuteScalarAsync<T>(string query, params SqlParameter[] parameters)
+        public static async Task<T> ExecuteScalarAsync<T>(string query, params SqlParameter[] parameters) //  Add try with block at last application layer 
         {
             if (string.IsNullOrEmpty(query))
                 throw new ArgumentException("Query cannot be null or empty", nameof(query));
