@@ -47,7 +47,16 @@ namespace BattlefieldCompetitivePortal.API.Controllers
                 return CreatedAtAction(nameof(GetTournaments),
                     new { id = created.TournamentId }, created);
             }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to create tournament" });
+            }
+        }
 
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst("UserId");
+            return int.Parse(userIdClaim.Value);
         }
     }
 }
