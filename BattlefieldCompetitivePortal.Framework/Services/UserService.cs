@@ -12,18 +12,20 @@ using System.Threading.Tasks;
 
 namespace BattlefieldCompetitivePortal.Framework.Services
 {
+    // Fixed UserService in Framework
     public class UserService
     {
+        // Fixed: Added return type and corrected parameter name
         public async Task<User> ValidateUser(string username, string password)
         {
             try
             {
                 var query = @"
-                    SELECT UserId, Username, Email, PasswordHash, Role, TeamId, PlayerRole, CreatedDate, IsActive
-                    FROM Users
-                    WHERE Username = @Username AND IsActive = 1";
-
-                var parameters = new[] { new SqlParameter("@username", username) };
+                SELECT UserId, Username, Email, PasswordHash, Role, TeamId, PlayerRole, CreatedDate, IsActive
+                FROM Users
+                WHERE Username = @Username AND IsActive = 1";
+                // Fixed: Parameter name should match the SQL parameter
+                var parameters = new[] { new SqlParameter("@Username", username) };
                 var dt = await DatabaseHelper.ExecuteQueryAsync(query, parameters);
 
                 if (dt.Rows.Count == 0)
@@ -32,24 +34,28 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 var row = dt.Rows[0];
                 var storedHash = row["PasswordHash"].ToString();
 
-                if (!AuthenticationHelper.VerifyPassword(username, storedHash))
+                // Fixed: Pass password instead of username to verify method
+                if (!AuthenticationHelper.VerifyPassword(password, storedHash))
                     return null;
 
                 return MapUserFromDataRow(row);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("Authyentication failed", ex);
+                // Fixed: Spelling error
+                throw new ApplicationException("Authentication failed", ex);
             }
         }
 
+        // Fixed: Added return type
         public async Task<User> GetUserById(int userId)
         {
             var query = @"
-                SELECT u.*, t.TeamName
-                FROM Users u
-                LEFT JOIN Teams t ON u.TeamId = t.TeamId
-                WHERE u.UserId = @UserId AND u.IsActive = 1";
+            SELECT u.UserId, u.Username, u.Email, u.PasswordHash, u.Role, u.TeamId, 
+                   u.PlayerRole, u.CreatedDate, u.IsActive, t.TeamName
+            FROM Users u
+            LEFT JOIN Teams t ON u.TeamId = t.TeamId
+            WHERE u.UserId = @UserId AND u.IsActive = 1";
 
             var parameters = new[] { new SqlParameter("@UserId", userId) };
             var dt = await DatabaseHelper.ExecuteQueryAsync(query, parameters);
@@ -57,27 +63,28 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             return dt.Rows.Count > 0 ? MapUserFromDataRow(dt.Rows[0]) : null;
         }
 
+        // Fixed: Added return type
         public async Task<bool> CreateUser(User user)
         {
             user.PasswordHash = AuthenticationHelper.HashPassword(user.PasswordHash);
 
             var query = @"
-                INSERT INTO Users (Username, Email, PasswordHash, Role, CreatedDate, IsActive)
-                VALUES (@Username, @Email, @PasswordHash, @Role, GETDATE(), 1);
-                SELECT SCOPE_IDENTITY();";
+            INSERT INTO Users (Username, Email, PasswordHash, Role, CreatedDate, IsActive)
+            VALUES (@Username, @Email, @PasswordHash, @Role, GETDATE(), 1);
+            SELECT SCOPE_IDENTITY();";
 
             var parameters = new[]
             {
-                new SqlParameter("@Username", user.Username),
-                new SqlParameter("@Email", user.Email),
-                new SqlParameter("@PasswordHash", user.PasswordHash),
-                new SqlParameter("@Role", (int)user.Role),
+            new SqlParameter("@Username", user.Username),
+            new SqlParameter("@Email", user.Email),
+            new SqlParameter("@PasswordHash", user.PasswordHash),
+            new SqlParameter("@Role", (int)user.Role),
             };
 
-            var UserId = await DatabaseHelper.ExecuteScalarAsync<int>(query, parameters);
-            user.UserId = UserId;
+            var userId = await DatabaseHelper.ExecuteScalarAsync<int>(query, parameters);
+            user.UserId = userId;
 
-            return UserId > 0;
+            return userId > 0;
         }
 
         private User MapUserFromDataRow(DataRow row)
@@ -89,7 +96,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 Email = row.Field<string>("Email"),
                 PasswordHash = row.Field<string>("PasswordHash"),
                 Role = (UserRole)row.Field<int>("Role"),
-                TeamId = row.Field<int>("TeamId"),
+                TeamId = row.Field<int?>("TeamId"),
                 PlayerRole = row.Field<int?>("PlayerRole") != null
                     ? (PlayerRole)row.Field<int>("PlayerRole")
                     : null,
