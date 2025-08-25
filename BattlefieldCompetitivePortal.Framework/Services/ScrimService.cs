@@ -104,10 +104,11 @@ namespace BattlefieldCompetitivePortal.Framework.Services
 
             if (result > 0 && _notificationService != null)
             {
-                _notificationService.SendNotificationToRole(
+                await _notificationService.SendNotificationToRole(
                     UserRole.Admin,
                     "Scrim Join Request",
-                    $"A team has requested to join a scrim #{scrimId}"
+                    $"A team has requested to join a scrim #{scrimId}",
+                    (int)NotificationType.ScrimJoinRequest
                 );
             }
 
@@ -155,18 +156,20 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                         var captain2Id = row["Captain2Id"] as int?;
 
                         // Notify team captains
-                        _notificationService.SendNotificationToUser(
+                        await _notificationService.SendNotificationToUser(
                             captain1Id,
                             "Scrim Approved",
-                            "Your scrim request has been approved!"
+                            "Your scrim request has been approved!",
+                            (int)NotificationType.ScrimJoinApproved
                         );
 
                         if (captain2Id.HasValue)
                         {
-                            _notificationService.SendNotificationToUser(
-                            captain2Id,
+                            await _notificationService.SendNotificationToUser(
+                            (int)captain2Id,
                             "Scrim Approved",
-                            "Your scrim request has been approved!"
+                            "Your scrim request has been approved!",
+                            (int)NotificationType.ScrimJoinApproved
                             );
                         }
                     }

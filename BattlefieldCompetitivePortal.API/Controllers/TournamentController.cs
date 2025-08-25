@@ -1,4 +1,5 @@
 ﻿using BattlefieldCompetitivePortal.Framework.Models;
+using BattlefieldCompetitivePortal.Framework.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static BattlefieldCompetitivePortal.Framework.Security.AuthenticationHelper;
@@ -33,7 +34,7 @@ namespace BattlefieldCompetitivePortal.API.Controllers
 
         [HttpPost]
         [RequireRole(UserRole.Admin)]
-        public IActionResult CreateTournament([FromBody] Tournament tournament)
+        public async Task<IActionResult> CreateTournament([FromBody] Tournament tournament)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -43,7 +44,7 @@ namespace BattlefieldCompetitivePortal.API.Controllers
                 var userId = GetCurrentUserId();
                 tournament.CreatedBy = userId;
 
-                var created = _tournamentService.CreateTournament(tournament);
+                var created = await _tournamentService.CreateTournament(tournament);
                 return CreatedAtAction(nameof(GetTournaments),
                     new { id = created.TournamentId }, created);
             }

@@ -1,5 +1,6 @@
 ﻿using BattlefieldCompetitivePortal.Framework.Data;
 using BattlefieldCompetitivePortal.Framework.Models;
+using BattlefieldCompetitivePortal.Framework.Services;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,14 @@ namespace BattlefieldCompetitivePortal.Framework.Services
 {
     public class TeamService
     {
-        private readonly NotificationService notificationService;
+        private readonly NotificationService _notificationService;
 
         public TeamService(NotificationService notificationService = null)
         {
-            this.notificationService = notificationService;
+            this._notificationService = notificationService;
         }
 
-        public TeamService CreateTeam(string teamName, int captainId)
+        public async Task<Team> CreateTeam(string teamName, int captainId)
         {
             using (var transaction = new TransactionScope())
             {
@@ -37,7 +38,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                         new SqlParameter("@CaptainId", captainId)
                     };
 
-                    var teamId = DatabaseHelper.ExecuteScalarAsync<int>(query, parameters);
+                    var teamId = await DatabaseHelper.ExecuteScalarAsync<int>(query, parameters);
 
                     // Update captains team assignment
                     var updateCaptainQuery = @"
@@ -52,7 +53,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                         new SqlParameter("@CaptainId", captainId)
                     };
 
-                    DatabaseHelper.ExecuteNonQueryAsync(updateCaptainQuery, updateParams);
+                    await DatabaseHelper.ExecuteNonQueryAsync(updateCaptainQuery, updateParams);
 
 
                     transaction.Complete();
@@ -92,13 +93,14 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 if (result > 0 && _notificationService != null)
                 {
                     // Notify team captain
-                    var captain = GetTeamCaptain(teamId);
+                    var captain = await GetTeamCaptainId(teamId);
                     if (captain != null)
                     {
-                        _notificationService.SendNotificationToUser(
+                        await _notificationService.SendNotificationToUser(
                             captain.UserId,
                             "New Team Join Request",
-                            "A player has requested to join your team"
+                            "A player has requested to join your team",
+                            (int)NotificationType.TeamJoinRequest
                             );
                     }
                 }
@@ -169,10 +171,11 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                     // Send notifications to player
                     if (_notificationService != null)
                     {
-                        _notificationService.SendNotificationToUser(
+                        await _notificationService.SendNotificationToUser(
                             playerId,
                             "Team Join Request Approved",
-                            $"You have been accepted to join the team!"
+                            $"You have been accepted to join the team!",
+                            (int)NotificationType.TeamJoinApproved// needs to be approved message
                         );
                     }
 

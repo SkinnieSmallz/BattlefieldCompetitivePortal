@@ -1,52 +1,52 @@
-﻿using BattlefieldCompetitivePortal.Framework.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-//using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+﻿//using BattlefieldCompetitivePortal.Framework.Services;
+//using Microsoft.AspNetCore.Authentication.Cookies;
+////using Microsoft.AspNetCore.Authentication.JwtBearer;
+//using Microsoft.IdentityModel.Tokens;
+//using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
+//var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//// Add services to the container
+//builder.Services.AddControllers();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
-// Register your Framework services
-builder.Services.AddScoped<UserService>();
+//// Register your Framework services
+//builder.Services.AddScoped<UserService>();
 
-// JWT Authentication (if using JWT)
-/*
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
-*/
+//// JWT Authentication (if using JWT)
+///*
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = true,
+//            ValidateAudience = true,
+//            ValidateLifetime = true,
+//            ValidateIssuerSigningKey = true,
+//            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//            ValidAudience = builder.Configuration["Jwt:Audience"],
+//            IssuerSigningKey = new SymmetricSecurityKey(
+//                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+//        };
+//    });
+//*/
 
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization();
 
-var app = builder.Build();
+//var app = builder.Build();
 
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//// Configure the HTTP request pipeline
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
+//app.UseHttpsRedirection();
+//app.UseAuthentication();
+//app.UseAuthorization();
+//app.MapControllers();
 
-app.Run();
+//app.Run();

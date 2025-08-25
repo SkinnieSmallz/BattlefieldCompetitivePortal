@@ -37,34 +37,89 @@ namespace BattlefieldCompetitivePortal.Framework.Data
             return this;
         }
 
-        public async DataTable Execute()
+        public async Task<DataTable> Execute()
         {
             return await DatabaseHelper.ExecuteQueryAsync(_query.ToString(), _parameters.ToArray());
         }
 
-        public async T ExecuteScalar<T>()
+        public async Task<T> ExecuteScalar<T>()
         {
             return await DatabaseHelper.ExecuteScalarAsync<T>(_query.ToString(), _parameters.ToArray());
         }
 
-        public List<Tournament> GetTournamentByStatus(TournamentStatus status, int? userId = null)
+        private List<Tournament> MapTournamentsFromDataTable(DataTable dataTable)
+        {
+            var tournaments = new List<Tournament>();
+
+            if (dataTable == null || dataTable.Rows.Count == 0)
+                return tournaments;
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var tournament = new Tournament
+                {
+                    TournamentId = Convert.ToInt32(row["TournamentId"]),
+                    TournamentName = row["TournamentName"]?.ToString(),
+                    Description = row["Description"]?.ToString(),
+                    StartDate = (DateTime)(row["StartDate"] != DBNull.Value ? Convert.ToDateTime(row["StartDate"]) : (DateTime?)null),
+                    EndDate = (DateTime)(row["EndDate"] != DBNull.Value ? Convert.ToDateTime(row["EndDate"]) : (DateTime?)null),
+                    Status = (TournamentStatus)Convert.ToInt32(row["Status"])
+                };
+
+                tournaments.Add(tournament);
+            }
+
+            return tournaments;
+        }
+
+        public SafeQueryBuilder OrderBy(string column, bool ascending = true)
+        {
+            _query.Append($" ORDER BY {column}");
+            if (!ascending)
+                _query.Append(" DESC");
+            return this;
+        }
+
+        public async Task<List<Tournament>> GetTournamentByStatus(TournamentStatus status, int? userId = null)
         {
             var queryBuilder = new SafeQueryBuilder()
-                .Select("TournamentId, TournamentName, Description, StartDate, EndDate, Status")
-                .From("Tournaments")
-                .Where("Status = @Status", "Status", (int)status)
-                .Where("IsActive = @IsActive", "IsActive", true);
+                .Select(" TournamentId, TournamentName, Description, StartDate, EndDate, Status")
+                .From(" Tournaments")
+                .Where(" Status = @Status", "Status", (int)status)
+                .Where(" IsActive = @IsActive", "IsActive", true);
 
             if (userId.HasValue)
             {
-                queryBuilder.Where("CreatedBy = @CreatedBy", "CreatedBy", userId.Value);
+                queryBuilder.Where(" CreatedBy = @CreatedBy", "CreatedBy", userId.Value);
             }
 
-            var dt = queryBuilder.OrderBy("Startdate", true).Execute();
+            var dt = await queryBuilder.OrderBy("StartDate", true).Execute();
             return MapTournamentsFromDataTable(dt);
         }
 
-        // Add MapTournamentsFromDataTable method
+        public SafeQueryBuilder Insert(string table)
+        {
+            _query.Clear();
+            _parameters.Clear();
+            _query.Append($"INSERT INTO {table}");
+            return this;
+        }
+
+        public SafeQueryBuilder Values(Dictionary<string, object> columnValues)
+        {
+            var columns = string.Join(", ", columnValues.Keys);
+            var paramNames = columnValues.Keys.Select(k => $"@{k}");
+            var parameters = string.Join(", ", paramNames);
+
+            _query.Append($" ({columns}) VALUES ({parameters}); SELECT CAST(SCOPE_IDENTITY() as int);");
+
+            foreach (var kvp in columnValues)
+            {
+                _parameters.Add(new SqlParameter($"@{kvp.Key}", kvp.Value ?? DBNull.Value));
+            }
+
+            return this;
+        }
     }
 }
 
