@@ -22,7 +22,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             _notificationService = notificationService;
         }
 
-        public List<Scrim> GetUpcomingScrims()
+        public async Task <List<Scrim>> GetUpcomingScrims()
         {
             var query = @"
                 SELECT s.*, t1.TeamName as Team1Name, t2.TeamName as Team2Name,
@@ -35,7 +35,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 AND s.Status IN (1,2) -- Pending or Approved
                 ORDER BY s.ScheduledDate";
 
-            var dt = DatabaseHelper.ExecuteQueryAsync(query);
+            var dt = await DatabaseHelper.ExecuteQueryAsync(query);
             return MapScrimsFromDataTable(dt);
         }
 
@@ -60,7 +60,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             return scrim;
         }
 
-        public async bool RequestToJoinScrim(int scrimId, int teamId)
+        public async Task<bool> RequestToJoinScrim(int scrimId, int teamId)
         {
             // Check if scrim exists and is available
             var checkQuery = @"
@@ -79,7 +79,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             var team2Id = row["Team2Id"] as int?;
             var status = (ScrimStatus)Convert.ToInt32(row["status"]);
 
-            if (team1Id == TeamId)
+            if (team1Id == teamId)
                 throw new InvalidOperationException("Cannot join your own scrim");
 
             if (team2Id.HasValue)
@@ -100,7 +100,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 new SqlParameter("@ScrimId", scrimId)
             };
 
-            var result = DatabaseHelper.ExecuteNonQueryAsync(updateQuery, parameters);
+            var result = await DatabaseHelper.ExecuteNonQueryAsync(updateQuery, parameters);
 
             if (result > 0 && _notificationService != null)
             {
@@ -111,10 +111,10 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 );
             }
 
-            return result;
+            return result > 0;
         }
 
-        public async void ApproveScrim(int scrimId, int? team2Id = null)
+        public async Task ApproveScrim(int scrimId, int? team2Id = null)
         {
             using (var transaction = new TransactionScope())
             {
