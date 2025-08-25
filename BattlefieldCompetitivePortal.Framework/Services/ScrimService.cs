@@ -22,7 +22,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             _notificationService = notificationService;
         }
 
-        public async Task <List<Scrim>> GetUpcomingScrims()
+        public async Task<List<Scrim>> GetUpcomingScrims()
         {
             var query = @"
                 SELECT s.*, t1.TeamName as Team1Name, t2.TeamName as Team2Name,
@@ -182,33 +182,24 @@ namespace BattlefieldCompetitivePortal.Framework.Services
 
         private List<Scrim> MapScrimsFromDataTable(DataTable dt)
         {
-            var scrims = new List<Scrim>();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                scrims.Add(new Scrim
+            return dt.AsEnumerable()
+                .Select(row => new Scrim
                 {
-                    ScrimId = Convert.ToInt32(row["ScrimId"]),
-                    Team1Id = Convert.ToInt32(row["Team1Id"]),
-                    Team2Id = row["Team2Id"] as int?,
-                    ScheduledDate = Convert.ToDateTime(row["ScheduledDate"]),
-                    Status = (ScrimStatus)Convert.ToInt32(row["Status"]),
-                    WinnerTeamId = row["WinnerTeamId"] as int?,
-                    RequestedBy = Convert.ToInt32(row["RequestedBy"]),
-                    CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
-                    Team1Name = row["Team1Name"].ToString(),
-                    Team2Name = row["Team2Name"]?.ToString(),
-                    RequestedByName = row["RequestedByName"].ToString()
-                });
-            }
+                    ScrimId = row.Field<int>("ScrimId"),
+                    Team1Id = row.Field<int>("Team1Id"),
+                    Team2Id = row.Field<int?>("Team2Id"),
+                    ScheduledDate = row.Field<DateTime>("ScheduledDate"),
+                    Status = (ScrimStatus)row.Field<int>("Status"),
+                    WinnerTeamId = row.Field<int>("WinnerTeamId"),
+                    RequestedBy = row.Field<int>("RequestedBy"),
+                    CreatedDate = row.Field<DateTime>("CreatedDate"),
+                    Team1Name = row.Field<string>("Team1Name"),
+                    Team2Name = row.Field<string>("Team2Name"),
+                    RequestedByName = row.Field<string>("RequestedByName")
+                })
 
-            return scrims;
+                .ToList();
+
         }
     }
 }
-
-
-
-
-
-
