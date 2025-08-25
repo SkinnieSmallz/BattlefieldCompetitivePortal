@@ -84,16 +84,17 @@ namespace BattlefieldCompetitivePortal.Framework.Services
         {
             return new User
             {
-                UserId = Convert.ToInt32(row["UserId"]),
-                Username = row["Username"].ToString(),
-                Email = row["Email"].ToString(),
-                PasswordHash = row["PasswordHash"].ToString(),
-                Role = (UserRole)Convert.ToInt32(row["Role"]),
-                TeamId = row["TeamId"] as int?,
-                PlayerRole = row["PlayerRole"] as int? != null ?
-                    (PlayerRole)Convert.ToInt32(row["PlayerRole"]) : null,
-                CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
-                IsActive = Convert.ToBoolean(row["IsActive"])
+                UserId = row.Field<int>("UserId"),
+                Username = row.Field<string>("Username"),
+                Email = row.Field<string>("Email"),
+                PasswordHash = row.Field<string>("PasswordHash"),
+                Role = (UserRole)row.Field<int>("Role"),
+                TeamId = row.Field<int>("TeamId"),
+                PlayerRole = row.Field<int?>("PlayerRole") != null
+                    ? (PlayerRole)row.Field<int>("PlayerRole")
+                    : null,
+                CreatedDate = row.Field<DateTime>("CreatedDate"),
+                IsActive = row.Field<bool>("IsActive")
             };
         }
     }
