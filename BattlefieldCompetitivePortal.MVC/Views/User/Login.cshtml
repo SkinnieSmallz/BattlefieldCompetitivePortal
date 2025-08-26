@@ -1,0 +1,428 @@
+﻿@using BattlefieldCompetitivePortal.MVC.Controllers
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Command Center Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            /* Animated Background */
+            body::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 25% 25%, rgba(255, 107, 53, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 107, 53, 0.05) 0%, transparent 50%);
+                z-index: 1;
+            }
+
+        /* Grid Pattern */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,107,53,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            animation: gridMove 25s linear infinite;
+            z-index: 1;
+        }
+
+        @@keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(20px, 20px);
+            }
+        }
+
+        /* Login Container */
+        .login-container {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 15px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+            .login-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #ff6b35, #f7931e, #ff6b35);
+                border-radius: 15px 15px 0 0;
+            }
+
+        /* Header */
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .login-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ff6b35;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #ff6b35;
+                box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .form-control::placeholder {
+                color: rgba(255, 255, 255, 0.5);
+            }
+
+        /* Checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+            .checkbox-container input[type="checkbox"] {
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                border: 2px solid rgba(255, 107, 53, 0.5);
+                border-radius: 4px;
+                margin-right: 0.75rem;
+                position: relative;
+                cursor: pointer;
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+                .checkbox-container input[type="checkbox"]:checked {
+                    background: #ff6b35;
+                    border-color: #ff6b35;
+                }
+
+                    .checkbox-container input[type="checkbox"]:checked::after {
+                        content: '✓';
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        color: white;
+                        font-weight: bold;
+                        font-size: 14px;
+                    }
+
+        .checkbox-label {
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            margin-bottom: 1rem;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+            }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.5);
+                color: #ffffff;
+                text-decoration: none;
+            }
+
+        /* Error Messages */
+        .validation-summary-errors {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #ff6b6b;
+        }
+
+            .validation-summary-errors ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .validation-summary-errors li {
+                margin-bottom: 0.5rem;
+            }
+
+                .validation-summary-errors li:last-child {
+                    margin-bottom: 0;
+                }
+
+        .field-validation-error {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Links */
+        .auth-links {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+            .auth-links a {
+                color: #ff6b35;
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+                .auth-links a:hover {
+                    color: #f7931e;
+                    text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+                }
+
+        /* Back to Home */
+        .back-home {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            z-index: 20;
+        }
+
+            .back-home a {
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                padding: 0.5rem 1rem;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 5px;
+                transition: all 0.3s ease;
+            }
+
+                .back-home a:hover {
+                    color: #ff6b35;
+                    border-color: #ff6b35;
+                    background: rgba(255, 107, 53, 0.1);
+                }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+            .loading .btn-primary {
+                background: #666;
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .login-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .login-title {
+                font-size: 2rem;
+            }
+
+            .back-home {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+
+    <div class="back-home">
+        <a href="@Url.Action("Index", "Home")">← Base Camp</a>
+    </div>
+
+    <div class="login-container">
+        <div class="login-header">
+            <h1 class="login-title">Access Terminal</h1>
+            <p class="login-subtitle">Enter Credentials</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-summary-errors">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="Login" asp-controller="User" method="post" id="loginForm">
+            @Html.AntiForgeryToken()
+
+            @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+            {
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+            }
+
+            <div class="form-group">
+                <label asp-for="Username" class="form-label">Call Sign</label>
+                <input asp-for="Username" class="form-control" placeholder="Enter your username" autocomplete="username" required />
+                <span asp-validation-for="Username" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="form-label">Access Code</label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="Enter your password" autocomplete="current-password" required />
+                <span asp-validation-for="Password" class="field-validation-error"></span>
+            </div>
+
+            <div class="checkbox-container">
+                <input asp-for="RememberMe" type="checkbox" id="rememberMe" />
+                <label for="rememberMe" class="checkbox-label">Remember this terminal</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Deploy to Battlefield
+            </button>
+
+            <a href="@Url.Action("Create", "User")" class="btn btn-secondary">
+                Request New Access
+            </a>
+        </form>
+
+        <div class="auth-links">
+            <p>Need backup? <a href="@Url.Action("Index", "Home")">Return to base</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Form submission animation
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const form = e.target;
+            const button = form.querySelector('.btn-primary');
+
+            button.textContent = 'Connecting...';
+            form.classList.add('loading');
+        });
+
+        // Auto-focus first input
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstInput = document.querySelector('.form-control');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
