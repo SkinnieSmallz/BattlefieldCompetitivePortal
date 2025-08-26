@@ -11,6 +11,9 @@ namespace BattlefieldCompetitivePortal.Framework.Models
         public int UserId { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public string? ContactNumber { get; set; }
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
         public int? TeamId { get; set; }

@@ -2,6 +2,7 @@
 using BattlefieldCompetitivePortal.Framework.Models;
 using BattlefieldCompetitivePortal.Framework.Security;
 using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -68,23 +69,50 @@ namespace BattlefieldCompetitivePortal.Framework.Services
         {
             user.PasswordHash = AuthenticationHelper.HashPassword(user.PasswordHash);
 
-            var query = @"
-            INSERT INTO Users (Username, Email, PasswordHash, Role, CreatedDate, IsActive)
-            VALUES (@Username, @Email, @PasswordHash, @Role, GETDATE(), 1);
-            SELECT SCOPE_IDENTITY();";
+            var storedProcedure = "auth.spUsers_Create";
 
+            // Define the parameters to pass to the stored procedure.
             var parameters = new[]
             {
             new SqlParameter("@Username", user.Username),
             new SqlParameter("@Email", user.Email),
+            new SqlParameter("@Name", user.Name),
+            new SqlParameter("@Surname", user.Surname),
+            new SqlParameter("@ContactNumber", user.ContactNumber),
             new SqlParameter("@PasswordHash", user.PasswordHash),
             new SqlParameter("@Role", (int)user.Role),
-            };
 
-            var userId = await DatabaseHelper.ExecuteScalarAsync<int>(query, parameters);
+            // Handle nullable parameters correctly.
+            // If the value is null, send DBNull.Value to the database.
+            new SqlParameter("@TeamId", (object)user.TeamId ?? DBNull.Value),
+            new SqlParameter("@PlayerRole", (object)user.PlayerRole ?? DBNull.Value)
+        };
+
+            // Execute the stored procedure and get the new user's ID back.
+            // We use ExecuteScalarAsync because the stored procedure returns a single value (the new ID).
+            var userId = await DatabaseHelper.ExecuteScalarAsync<int>(storedProcedure, parameters);
+
             user.UserId = userId;
 
             return userId > 0;
+
+            //var query = @"
+            //INSERT INTO Users (Username, Email, PasswordHash, Role, CreatedDate, IsActive)
+            //VALUES (@Username, @Email, @PasswordHash, @Role, GETDATE(), 1);
+            //SELECT SCOPE_IDENTITY();";
+
+            //var parameters = new[]
+            //{
+            //new SqlParameter("@Username", user.Username),
+            //new SqlParameter("@Email", user.Email),
+            //new SqlParameter("@PasswordHash", user.PasswordHash),
+            //new SqlParameter("@Role", (int)user.Role),
+            //};
+
+            //var userId = await DatabaseHelper.ExecuteScalarAsync<int>(query, parameters);
+            //user.UserId = userId;
+
+            //return userId > 0;
         }
 
         private User MapUserFromDataRow(DataRow row)

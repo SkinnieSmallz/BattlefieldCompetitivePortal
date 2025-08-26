@@ -96,5 +96,6 @@
     <Build Include="Tables\teams\TeamJoinRequests.sql" />
     <Build Include="Tables\notifications\Notifications.sql" />
     <Build Include="Tables\notifications\Notices.sql" />
+    <Build Include="Stored Procedures\auth\spUsers_Create.sql" />
   </ItemGroup>
 </Project>

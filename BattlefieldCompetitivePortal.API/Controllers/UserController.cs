@@ -62,7 +62,7 @@ namespace BattlefieldCompetitivePortal.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
         {
             try
@@ -74,10 +74,13 @@ namespace BattlefieldCompetitivePortal.API.Controllers
                 {
                     Username = request.Username,
                     Email = request.Email,
+                    Name = request.Name,
+                    Surname = request.Surname,
+                    ContactNumber = request.ContactNumber,
                     PasswordHash = request.Password, // Will be hashed in service
-                    Role = request.Role,
-                    TeamId = request.TeamId,
-                    PlayerRole = request.PlayerRole,
+                    Role = UserRole.Player,
+                    TeamId = null,
+                    PlayerRole = null,
                     CreatedDate = DateTime.UtcNow,
                     IsActive = true
                 };
@@ -129,6 +132,9 @@ namespace BattlefieldCompetitivePortal.API.Controllers
     {
         public string Username { get; set; }
         public string Email { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public string? ContactNumber { get; set; }
         public string Password { get; set; }
         public UserRole Role { get; set; }
         public int? TeamId { get; set; }

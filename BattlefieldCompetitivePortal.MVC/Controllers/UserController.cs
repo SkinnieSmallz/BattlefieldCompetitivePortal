@@ -113,10 +113,13 @@ namespace BattlefieldCompetitivePortal.MVC.Controllers
                 {
                     Username = model.Username,
                     Email = model.Email,
+                    Name = model.Name,
+                    Surname = model.Surname,
+                    ContactNumber = model.ContactNumber,
                     PasswordHash = model.Password, // Will be hashed in service
-                    Role = model.Role,
-                    TeamId = model.TeamId,
-                    PlayerRole = model.PlayerRole,
+                    Role = UserRole.Player,
+                    TeamId = null,
+                    PlayerRole = null,
                     CreatedDate = DateTime.UtcNow,
                     IsActive = true
                 };
@@ -199,6 +202,9 @@ namespace BattlefieldCompetitivePortal.MVC.Controllers
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public string? ContactNumber { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
