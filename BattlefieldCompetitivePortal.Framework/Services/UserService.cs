@@ -2,11 +2,14 @@
 using BattlefieldCompetitivePortal.Framework.Models;
 using BattlefieldCompetitivePortal.Framework.Security;
 using Microsoft.Data.SqlClient;
-using System.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,36 +68,66 @@ namespace BattlefieldCompetitivePortal.Framework.Services
         }
 
         // Fixed: Added return type
+
         public async Task<bool> CreateUser(User user)
         {
             user.PasswordHash = AuthenticationHelper.HashPassword(user.PasswordHash);
-
             var storedProcedure = "auth.spUsers_Create";
 
-            // Define the parameters to pass to the stored procedure.
             var parameters = new[]
             {
-            new SqlParameter("@Username", user.Username),
-            new SqlParameter("@Email", user.Email),
-            new SqlParameter("@Name", user.Name),
-            new SqlParameter("@Surname", user.Surname),
-            new SqlParameter("@ContactNumber", user.ContactNumber),
-            new SqlParameter("@PasswordHash", user.PasswordHash),
-            new SqlParameter("@Role", (int)user.Role),
+        new SqlParameter("@Username", string.IsNullOrEmpty(user.Username) ? (object)DBNull.Value : user.Username),
+        new SqlParameter("@Email", string.IsNullOrEmpty(user.Email) ? (object)DBNull.Value : user.Email),
+        new SqlParameter("@Name", string.IsNullOrEmpty(user.Name) ? (object)DBNull.Value : user.Name),
+        new SqlParameter("@Surname", string.IsNullOrEmpty(user.Surname) ? (object)DBNull.Value : user.Surname),
+        new SqlParameter("@ContactNumber", string.IsNullOrEmpty(user.ContactNumber) ? (object)DBNull.Value : user.ContactNumber),
+        new SqlParameter("@PasswordHash", string.IsNullOrEmpty(user.PasswordHash) ? (object)DBNull.Value : user.PasswordHash),
+        new SqlParameter("@Role", (int)user.Role),
+        new SqlParameter("@TeamId", user.TeamId.HasValue ? (object)user.TeamId.Value : DBNull.Value),
+        new SqlParameter("@PlayerRole", string.IsNullOrEmpty(user.PlayerRole.ToString()) ? (object)DBNull.Value : user.PlayerRole)
+    };
 
-            // Handle nullable parameters correctly.
-            // If the value is null, send DBNull.Value to the database.
-            new SqlParameter("@TeamId", (object)user.TeamId ?? DBNull.Value),
-            new SqlParameter("@PlayerRole", (object)user.PlayerRole ?? DBNull.Value)
-        };
-
-            // Execute the stored procedure and get the new user's ID back.
-            // We use ExecuteScalarAsync because the stored procedure returns a single value (the new ID).
-            var userId = await DatabaseHelper.ExecuteScalarAsync<int>(storedProcedure, parameters);
-
+            // Make sure you're only calling ExecuteScalarAsync ONCE
+            var userId = await DatabaseHelper.ExecuteScalarAsync<int>(storedProcedure, parameters, CommandType.StoredProcedure);
             user.UserId = userId;
-
             return userId > 0;
+        }
+        //public async Task<bool> CreateUser(User user)
+        //{
+        //    user.PasswordHash = AuthenticationHelper.HashPassword(user.PasswordHash);
+
+        //    var storedProcedure = "auth.spUsers_Create";
+
+        //    // Define the parameters to pass to the stored procedure.
+        //    var parameters = new[]
+        //    {
+        //    new SqlParameter("@Username", user.Username),
+        //    new SqlParameter("@Email", user.Email),
+        //    new SqlParameter("@Name", user.Name),
+        //    new SqlParameter("@Surname", user.Surname),
+        //    new SqlParameter("@ContactNumber", user.ContactNumber),
+        //    new SqlParameter("@PasswordHash", user.PasswordHash),
+        //    new SqlParameter("@Role", (int)user.Role),
+
+        //    // Handle nullable parameters correctly.
+        //    // If the value is null, send DBNull.Value to the database.
+        //    new SqlParameter("@TeamId", (object)user.TeamId ?? DBNull.Value),
+        //    new SqlParameter("@PlayerRole", (object)user.PlayerRole ?? DBNull.Value)
+        //};
+
+        //    // DEBUG: Check parameter values
+        //    foreach (var param in parameters)
+        //    {
+        //        Debug.WriteLine($"{param.ParameterName}: '{param.Value}'");
+        //    }
+
+        //    // Execute the stored procedure and get the new user's ID back.
+        //    // We use ExecuteScalarAsync because the stored procedure returns a single value (the new ID).
+        //    var userId = await DatabaseHelper.ExecuteScalarAsync<int>(storedProcedure, parameters);
+
+        //    user.UserId = userId;
+
+        //    return userId > 0;
 
             //var query = @"
             //INSERT INTO Users (Username, Email, PasswordHash, Role, CreatedDate, IsActive)
@@ -113,7 +146,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             //user.UserId = userId;
 
             //return userId > 0;
-        }
+        //}
 
         private User MapUserFromDataRow(DataRow row)
         {
