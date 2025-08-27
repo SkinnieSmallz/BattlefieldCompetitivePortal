@@ -62,7 +62,7 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             WHERE u.UserId = @UserId AND u.IsActive = 1";
 
             var parameters = new[] { new SqlParameter("@UserId", userId) };
-            var dt = await DatabaseHelper.ExecuteQueryAsync(query, parameters);
+            var dt = await DatabaseHelper.ExecuteQueryAsync(query, parameters);  //CommandType.StoredProcedure
 
             return dt.Rows.Count > 0 ? MapUserFromDataRow(dt.Rows[0]) : null;
         }
@@ -155,6 +155,9 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 UserId = row.Field<int>("UserId"),
                 Username = row.Field<string>("Username"),
                 Email = row.Field<string>("Email"),
+                Name = row.Field<string>("Name"),
+                Surname = row.Field<string>("Surname"),
+                ContactNumber = row.Field<string>("ContactNumber"),
                 PasswordHash = row.Field<string>("PasswordHash"),
                 Role = (UserRole)row.Field<int>("Role"),
                 TeamId = row.Field<int?>("TeamId"),
