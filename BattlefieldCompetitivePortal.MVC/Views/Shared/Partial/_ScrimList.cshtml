@@ -1,0 +1,70 @@
+﻿@using BattlefieldCompetitivePortal.Framework.Models
+@model List<Scrim>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Teams</th>
+                    <th>Scheduled Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var scrim in Model)
+                {
+                    <tr>
+                        <td>
+                            @scrim.Team1Name
+                            @if (!string.IsNullOrEmpty(scrim.Team2Name))
+                            {
+                                <span> vs @scrim.Team2Name</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted"> (Looking for opponent)</span>
+                            }
+                        </td>
+                        <td>@scrim.ScheduledDate.ToString("MMM dd, yyyy HH:mm")</td>
+                        <td>
+                            <span class="badge badge-@GetStatusBadgeClass(scrim.Status)">
+                                @scrim.Status
+                            </span>
+                        </td>
+                        <td>
+                            @if (ViewBag.UserRole == UserRole.Admin && scrim.Status == ScrimStatus.Pending)
+                            {
+                                <button class="btn btn-sm btn-success"
+                                        onclick="approveScrim(@scrim.ScrimId)">
+                                    Approve
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-muted">No upcoming scrims</p>
+}
+
+@functions {
+    string GetStatusBadgeClass(ScrimStatus status)
+    {
+        switch (status)
+        {
+            case ScrimStatus.Pending: return "warning";
+            case ScrimStatus.Approved: return "info";
+            case ScrimStatus.InProgress: return "primary";
+            case ScrimStatus.Completed: return "success";
+            case ScrimStatus.Cancelled: return "danger";
+            default: return "secondary";
+        }
+    }
+}

@@ -9,6 +9,9 @@ namespace BattlefieldCompetitivePortal.MVC.Controllers
     public class HomeController : Controller
     {
         private readonly UserService _userService;
+        private readonly TournamentService _tournamentService;
+        private readonly ScrimService _scrimService;
+        private readonly NotificationService _notificationService;
 
         public HomeController(UserService userService)
         {
@@ -17,6 +20,28 @@ namespace BattlefieldCompetitivePortal.MVC.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var model = new DashboardModel
+            {
+                OnGoingTournaments = _tournamentService.GetCurrentTournaments(),
+                UpcomingScrims = _scrimService.GetUpcomingScrims(CurrentUser.TeamId),
+                RecentNotices = _notificationService.GetRecentNotices(5),
+                UserTeam = CurrentUser.TeamId.HasValue ?
+                    new TeamService().GetTeamById(CurrentUser.TeamId.Value) : null
+            };
+
+            ViewBag.UserRole = CurrentUser.Role;
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GetNotifications()
+        {
+            var notifications = new NotificationService()
+                .GetUnreadNotifications(CurrentUser.UserId);
+            return Json(notifications, JsonRequestBehaviour.AllowGet);
+        }
+    }
+
             try
             {
                 // Get real statistics from your database

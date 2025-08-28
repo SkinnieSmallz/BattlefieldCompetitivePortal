@@ -1,0 +1,104 @@
+﻿<!-- Views/Home/Index.cshtml -->
+@model DashboardViewModel
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="row">
+    <!-- User Profile Card -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Profile</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Username:</strong> @User.Identity.Name</p>
+                <p><strong>Role:</strong> @ViewBag.UserRole</p>
+                @if (Model.UserTeam != null)
+                {
+                    <p><strong>Team:</strong> @Model.UserTeam.TeamName</p>
+                }
+                <a href="@Url.Action("Profile", "Account")" class="btn btn-primary">
+                    Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ongoing Tournaments -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ongoing Tournaments</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.OngoingTournaments.Any())
+                {
+                    @foreach (var tournament in Model.OngoingTournaments)
+                    {
+                        <div class="tournament-item mb-3 p-3 border rounded">
+                            <h6>@tournament.TournamentName</h6>
+                            <p class="text-muted">@tournament.Description</p>
+                            <small>Ends: @tournament.EndDate.ToString("MMM dd, yyyy")</small>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">No ongoing tournaments</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Scrims -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Upcoming Scrims</h5>
+            </div>
+            <div class="card-body">
+                <div id="scrimsContainer">
+                    @Html.Partial("_ScrimsList", Model.UpcomingScrims)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            // Load notifications
+            loadNotifications();
+
+            // Setup SignalR for real-time updates
+            setupSignalR();
+        });
+
+        function loadNotifications() {
+            $.get('@Url.Action("GetNotifications", "Home")', function(data) {
+                updateNotificationBadge(data.length);
+                populateNotificationDropdown(data);
+            });
+        }
+
+        function setupSignalR() {
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl("/notificationHub")
+                .build();
+
+            connection.start().then(function() {
+                connection.invoke("JoinUserGroup", "@User.FindFirst("UserId").Value");
+                connection.invoke("JoinRoleGroup", "@ViewBag.UserRole");
+            });
+
+            connection.on("ReceiveNotification", function(notification) {
+                showNotificationToast(notification.title, notification.message);
+                loadNotifications(); // Refresh notification list
+            });
+        }
+    </script>
+}
