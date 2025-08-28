@@ -97,5 +97,6 @@
     <Build Include="Tables\notifications\Notifications.sql" />
     <Build Include="Tables\notifications\Notices.sql" />
     <Build Include="Stored Procedures\auth\spUsers_Create.sql" />
+    <Build Include="Stored Procedures\auth\spUsers_ValidateLogin.sql" />
   </ItemGroup>
 </Project>

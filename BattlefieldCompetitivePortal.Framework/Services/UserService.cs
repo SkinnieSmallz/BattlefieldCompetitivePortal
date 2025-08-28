@@ -22,15 +22,12 @@ namespace BattlefieldCompetitivePortal.Framework.Services
         // Fixed: Added return type and corrected parameter name
         public async Task<User> ValidateUser(string username, string password)
         {
+            var storedProcedure = "auth.spUsers_ValidateLogin";
+
             try
             {
-                var query = @"
-                SELECT UserId, Username, Email, PasswordHash, Role, TeamId, PlayerRole, CreatedDate, IsActive
-                FROM Users
-                WHERE Username = @Username AND IsActive = 1";
-                // Fixed: Parameter name should match the SQL parameter
                 var parameters = new[] { new SqlParameter("@Username", username) };
-                var dt = await DatabaseHelper.ExecuteQueryAsync(query, parameters);
+                var dt = await DatabaseHelper.ExecuteQueryAsync(storedProcedure, parameters, CommandType.StoredProcedure);
 
                 if (dt.Rows.Count == 0)
                     return null;
@@ -38,7 +35,6 @@ namespace BattlefieldCompetitivePortal.Framework.Services
                 var row = dt.Rows[0];
                 var storedHash = row["PasswordHash"].ToString();
 
-                // Fixed: Pass password instead of username to verify method
                 if (!AuthenticationHelper.VerifyPassword(password, storedHash))
                     return null;
 
@@ -46,7 +42,6 @@ namespace BattlefieldCompetitivePortal.Framework.Services
             }
             catch (Exception ex)
             {
-                // Fixed: Spelling error
                 throw new ApplicationException("Authentication failed", ex);
             }
         }

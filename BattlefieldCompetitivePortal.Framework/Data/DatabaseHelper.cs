@@ -16,38 +16,49 @@ namespace BattlefieldCompetitivePortal.Framework.Data
     public static class DatabaseHelper
     {
         public static string ConnectionString { get; set; } = string.Empty;
-    //ConfigurationManager.ConnectionStrings["BattlefieldPortal"]?.ConnectionString
-    //?? throw new InvalidOperationException("Connection string 'BattlefieldPortal' not found in configuration");
 
-        public static async Task<DataTable> ExecuteQueryAsync(string query, params SqlParameter[] parameters)
+        public static async Task<DataTable> ExecuteQueryAsync(
+            string query,
+            SqlParameter[] parameters = null,
+            CommandType commandType = CommandType.Text)
         {
-            DataTable dt = new DataTable();
+            if (string.IsNullOrWhiteSpace(query))
+                throw new ArgumentNullException("Query cannot be null or empty", nameof(query));
 
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            try
             {
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                DataTable dt = new DataTable();
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
                 {
-                    if (parameters != null)
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddRange(parameters);
-                    }
-                    else
-                    {
-                        //error logging // throw here 
-                    }
+                        cmd.CommandType = commandType;
+                        if (parameters?.Length > 0)
+                        {
+                            cmd.Parameters.AddRange(parameters);
+                        }
 
-                    await conn.OpenAsync();
-
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        dt.Load(reader);
+                        await conn.OpenAsync();
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            dt.Load(reader);
+                        }
                     }
                 }
+
+                return dt;
             }
-            return dt;
+            catch (Exception ex)
+            {
+                //
+                throw;
+            }
         }
 
-        public static async Task<int> ExecuteNonQueryAsync(string query, params SqlParameter[] parameters)
+        public static async Task<int> ExecuteNonQueryAsync(
+            string query,
+            SqlParameter[] parameters = null,
+            CommandType commandType = CommandType.Text)
         {
             if (string.IsNullOrWhiteSpace(query))
                 throw new ArgumentException("Query cannot be null, empty, or whitespace.", nameof(query));
